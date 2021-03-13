@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+readonly output_file="$(dirname "${BASH_SOURCE[0]}")/terraform.auto.tfvars"
+readonly subscription_name="Free Trial"
+readonly subscription_id="$(az account show --subscription "$subscription_name" --query id --output tsv)"
+
+if [ -z "$subscription_id" ]; then
+  echo "ERROR: Failed to find ID of subscription '$subscription_name'." 1>&2
+  exit 1
+fi
+
+echo "subscription_id = \"$subscription_id\"" >"$output_file"
+echo "Written $output_file"
