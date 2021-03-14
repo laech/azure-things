@@ -17,6 +17,22 @@ variable "subscription_id" {
   type = string
 }
 
+variable "location" {
+  default = "eastus"
+}
+
+variable "vm_size" {
+  default = "standard_b2s"
+}
+
+variable "node_count" {
+  default = 1
+}
+
+variable "kubernetes_version" {
+  default = "1.19.7"
+}
+
 provider "azurerm" {
   subscription_id = var.subscription_id
   features {}
@@ -31,7 +47,7 @@ locals {
 
 resource "azurerm_resource_group" "default" {
   name = "things"
-  location = "australiasoutheast"
+  location = var.location
 }
 
 resource "azurerm_virtual_network" "default" {
@@ -53,6 +69,7 @@ resource "azurerm_kubernetes_cluster" "default" {
   location = azurerm_resource_group.default.location
   resource_group_name = azurerm_resource_group.default.name
   dns_prefix = azurerm_resource_group.default.name
+  kubernetes_version = var.kubernetes_version
 
   identity {
     type = "SystemAssigned"
@@ -60,8 +77,8 @@ resource "azurerm_kubernetes_cluster" "default" {
 
   default_node_pool {
     name = azurerm_resource_group.default.name
-    node_count = 1
-    vm_size = "standard_d2_v2"
+    node_count = var.node_count
+    vm_size = var.vm_size
     vnet_subnet_id = azurerm_subnet.private.id
   }
 }
