@@ -43,6 +43,29 @@ resource "azurerm_resource_group" "default" {
   location = var.location
 }
 
+resource "random_id" "log_anaylytics_suffix" {
+  byte_length = 8
+}
+
+resource "azurerm_log_analytics_workspace" "default" {
+  name                = "${azurerm_resource_group.default.name}-${random_id.log_anaylytics_suffix.dec}"
+  location            = azurerm_resource_group.default.location
+  resource_group_name = azurerm_resource_group.default.name
+}
+
+resource "azurerm_log_analytics_solution" "default" {
+  solution_name         = "ContainerInsights"
+  location              = azurerm_resource_group.default.location
+  resource_group_name   = azurerm_resource_group.default.name
+  workspace_resource_id = azurerm_log_analytics_workspace.default.id
+  workspace_name        = azurerm_log_analytics_workspace.default.name
+
+  plan {
+    publisher = "Microsoft"
+    product   = "OMSGallery/ContainerInsights"
+  }
+}
+
 resource "azurerm_kubernetes_cluster" "default" {
   name                = azurerm_resource_group.default.name
   location            = azurerm_resource_group.default.location
@@ -64,6 +87,20 @@ resource "azurerm_kubernetes_cluster" "default" {
     vm_size    = var.vm_size
     node_count = var.node_count
   }
+
+  addon_profile {
+    oms_agent {
+      enabled                    = true
+      log_analytics_workspace_id = azurerm_log_analytics_workspace.default.id
+    }
+  }
+}
+
+# https://docs.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-update-metrics
+resource "azurerm_role_assignment" "metrics" {
+  scope                = azurerm_kubernetes_cluster.default.id
+  principal_id         = azurerm_kubernetes_cluster.default.addon_profile[0].oms_agent[0].oms_agent_identity[0].object_id
+  role_definition_name = "Monitoring Metrics Publisher"
 }
 
 resource "local_file" "kubeconfig" {
