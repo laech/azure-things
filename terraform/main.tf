@@ -17,6 +17,10 @@ variable "subscription_id" {
   type = string
 }
 
+variable "name" {
+  default = "things"
+}
+
 variable "location" {
   default = "eastus"
 }
@@ -39,7 +43,7 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "default" {
-  name     = "things"
+  name     = var.name
   location = var.location
 }
 
@@ -48,7 +52,7 @@ resource "random_id" "log_anaylytics_suffix" {
 }
 
 resource "azurerm_log_analytics_workspace" "default" {
-  name                = "${azurerm_resource_group.default.name}-${random_id.log_anaylytics_suffix.dec}"
+  name                = "${var.name}-${random_id.log_anaylytics_suffix.dec}"
   location            = azurerm_resource_group.default.location
   resource_group_name = azurerm_resource_group.default.name
 }
@@ -67,7 +71,7 @@ resource "azurerm_log_analytics_solution" "default" {
 }
 
 resource "azurerm_kubernetes_cluster" "default" {
-  name                = azurerm_resource_group.default.name
+  name                = var.name
   location            = azurerm_resource_group.default.location
   dns_prefix          = azurerm_resource_group.default.name
   kubernetes_version  = var.kubernetes_version
@@ -83,7 +87,7 @@ resource "azurerm_kubernetes_cluster" "default" {
   }
 
   default_node_pool {
-    name       = azurerm_resource_group.default.name
+    name       = var.name
     vm_size    = var.vm_size
     node_count = var.node_count
   }
