@@ -107,7 +107,18 @@ resource "azurerm_role_assignment" "metrics" {
   role_definition_name = "Monitoring Metrics Publisher"
 }
 
+resource "azurerm_application_insights" "java" {
+  name                = "${var.name}-java"
+  location            = azurerm_resource_group.default.location
+  resource_group_name = azurerm_resource_group.default.name
+  application_type    = "java"
+}
+
 resource "local_file" "kubeconfig" {
   filename = "kubeconfig"
   content  = azurerm_kubernetes_cluster.default.kube_config_raw
+}
+
+output "instrumentation_key_java" {
+  value = azurerm_application_insights.java.instrumentation_key
 }
