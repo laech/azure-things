@@ -47,6 +47,17 @@ resource "azurerm_resource_group" "default" {
   location = var.location
 }
 
+resource "random_id" "container_registry_suffix" {
+  byte_length = 4
+}
+
+resource "azurerm_container_registry" "default" {
+  name                = "${var.name}${random_id.container_registry_suffix.dec}"
+  location            = azurerm_resource_group.default.location
+  resource_group_name = azurerm_resource_group.default.name
+  sku                 = "basic"
+}
+
 resource "random_id" "log_anaylytics_suffix" {
   byte_length = 8
 }
@@ -121,4 +132,8 @@ resource "local_file" "kubeconfig" {
 
 output "instrumentation_key_java" {
   value = azurerm_application_insights.java.instrumentation_key
+}
+
+output "container_registry_login_server" {
+  value = azurerm_container_registry.default.login_server
 }
