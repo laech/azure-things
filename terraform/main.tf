@@ -111,6 +111,12 @@ resource "azurerm_kubernetes_cluster" "default" {
   }
 }
 
+resource "azurerm_role_assignment" "acr_pull" {
+  scope                = azurerm_container_registry.default.id
+  principal_id         = azurerm_kubernetes_cluster.default.kubelet_identity[0].object_id
+  role_definition_name = "AcrPull"
+}
+
 # https://docs.microsoft.com/en-us/azure/azure-monitor/containers/container-insights-update-metrics
 resource "azurerm_role_assignment" "metrics" {
   scope                = azurerm_kubernetes_cluster.default.id
