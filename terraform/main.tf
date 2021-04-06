@@ -36,32 +36,28 @@ resource "azurerm_resource_group" "default" {
 }
 
 module "container_registry" {
-  source          = "./container-registry"
-  prefix          = var.name
-  subscription_id = var.subscription_id
-  resource_group  = azurerm_resource_group.default
+  source         = "./container-registry"
+  prefix         = var.name
+  resource_group = azurerm_resource_group.default
 }
 
 module "log_analytics" {
-  source          = "./log-analytics"
-  prefix          = var.name
-  subscription_id = var.subscription_id
-  resource_group  = azurerm_resource_group.default
+  source         = "./log-analytics"
+  prefix         = var.name
+  resource_group = azurerm_resource_group.default
 }
 
 module "kubernetes" {
   source                     = "./kubernetes"
   prefix                     = var.name
-  subscription_id            = var.subscription_id
   resource_group             = azurerm_resource_group.default
   log_analytics_workspace_id = module.log_analytics.workspace_id
 }
 
 module "application_insight" {
-  source          = "./application-insights"
-  prefix          = var.name
-  subscription_id = var.subscription_id
-  resource_group  = azurerm_resource_group.default
+  source         = "./application-insights"
+  prefix         = var.name
+  resource_group = azurerm_resource_group.default
 }
 
 resource "azurerm_role_assignment" "acr_pull" {
