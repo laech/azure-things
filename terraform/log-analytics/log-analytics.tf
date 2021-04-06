@@ -1,7 +1,3 @@
-variable "subscription_id" {
-  type = string
-}
-
 variable "prefix" {
   type = string
 }
@@ -11,11 +7,6 @@ variable "resource_group" {
     name     = string
     location = string
   })
-}
-
-provider "azurerm" {
-  subscription_id = var.subscription_id
-  features {}
 }
 
 resource "random_id" "log_anaylytics_suffix" {

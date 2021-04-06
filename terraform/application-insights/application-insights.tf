@@ -1,7 +1,3 @@
-variable "subscription_id" {
-  type = string
-}
-
 variable "resource_group" {
   type = object({
     name     = string
@@ -11,11 +7,6 @@ variable "resource_group" {
 
 variable "prefix" {
   type = string
-}
-
-provider "azurerm" {
-  subscription_id = var.subscription_id
-  features {}
 }
 
 resource "azurerm_application_insights" "java" {
