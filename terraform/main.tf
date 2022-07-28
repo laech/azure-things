@@ -5,12 +5,6 @@ terraform {
       version = "2.50.0"
     }
   }
-  backend "remote" {
-    organization = "lae"
-    workspaces {
-      name = "azure-things"
-    }
-  }
 }
 
 variable "subscription_id" {
