@@ -5,6 +5,12 @@ terraform {
       version = "2.50.0"
     }
   }
+  cloud {
+    organization = "lae"
+    workspaces {
+      name = "azure-things"
+    }
+  }
 }
 
 variable "subscription_id" {
